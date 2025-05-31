@@ -22,6 +22,8 @@ class Graph {
 
         void add_edge(Node* from, Node* to, int weight);
 
+        vector<Node*> tarjan();
+
         void print_nodes() const;
 
         void print_edges() const;
