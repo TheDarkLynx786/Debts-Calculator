@@ -15,6 +15,8 @@ void Graph::add_edge(Node* from, Node* to, int weight) {
     from->add_neighbor(to); 
 }
 
+vector<Node*> Graph::get_nodes() { return this->nodes; }
+
 // Display all nodes and their numbers
 void Graph::print_nodes() const {
     cout << "Nodes: \n" << endl;
@@ -35,7 +37,7 @@ void Graph::print_edges() const {
     cout << endl;
 }
 
-vector<Node*> Graph::tarjan() {
+/*vector<Node*> Graph::dfs() {
     vector<Node*> unvisited = this->nodes;
     // This vector SHOULD have the correct DFS order of nodes ( if using push_front() )
     vector<Node*> visited = {};
@@ -87,6 +89,128 @@ vector<Node*> Graph::tarjan() {
                 if(!node->is_visited()) stack.push(node);
             }
         }    
+    }
+
+    return visited;
+}*/
+
+void Graph::dfs(vector<Node*> unvisited, vector<Node*>& visited, stack<Node*> exploration_stack) {
+    // Base Case
+    if(unvisited.size() == 0) return;
+
+    // Step
+    Node* node = (exploration_stack.size() == 0)? unvisited.front() : exploration_stack.top();
+    if (exploration_stack.size() != 0) exploration_stack.pop();
+    
+    // If node is already visited (through the stack), then skip it
+    if(node->is_visited()) {
+        dfs(unvisited, visited, exploration_stack); 
+        return;
+    }
+
+    // Set node to visited and add to "visited"
+    node->set_visited();
+    visited.push_back(node);
+    
+    // Remove from "unvisited"
+    for(int i = 0; i < unvisited.size(); i++) { if(unvisited.at(i) == node) unvisited.erase(unvisited.begin() + i); }
+
+    // Get adjacency list
+    vector<Node*> adj_list = node->get_adjacency_list();
+
+    // Add each adjacent node to the stack
+    for(Node* nd : adj_list) exploration_stack.push(nd);
+
+    dfs(unvisited, visited, exploration_stack);
+    return;
+}
+
+vector<Node*> Graph::tarjan() {
+    vector<Node*> unvisited = this->nodes;
+    // This vector SHOULD have the correct DFS order of nodes ( if using push_front() )
+    vector<Node*> visited = {};
+    stack<Node*> stack;
+
+    vector<int> dfs_num;
+    int counter = 0;
+    vector<int> dfs_low(unvisited.size(), -1);
+    
+    vector<vector<Node*>> sccs;
+
+    while(unvisited.size() != 0) {
+        Node* temp;
+        
+        // When no nodes are visited
+        if(stack.size() == 0) {
+            // Get front of univisited vector, remove it from unvisited, and set it as visited
+            temp = unvisited.front();
+            unvisited.erase(unvisited.begin());
+            temp->set_visited();
+            visited.push_back(temp);
+
+            
+            // If no nodes left in unvisited, break the loop
+            if(unvisited.size() == 0) break;
+            
+            // Add to stack
+            stack.push(temp);
+
+            // Set DFS number
+            dfs_num.push_back(counter);
+
+            // Add first neighbord in adj list to stack
+            vector<Node*> adj_list = temp->get_adjacency_list();
+            bool adj = false;
+            for(Node* node : adj_list) {
+                if(!node->is_visited()) {
+                    stack.push(node);
+                    adj = true;
+                    break;
+                }
+            }
+
+            // This would mean that theres a single disconnected SCC
+            if(!adj) {
+                vector<Node*> new_scc;
+                new_scc.push_back(temp);
+                sccs.push_back(new_scc);
+                stack.pop();
+            }
+
+        } else if(stack.size() > 0) { // When stack has Node(s)
+            
+            // Get top node from stack and pop
+            temp = stack.top();
+
+            // Set top node to visited
+            temp->set_visited();
+            visited.push_back(temp);
+            
+            // Remove node from unvisited
+            for(int i = 0; i < unvisited.size(); i++) {
+                if(temp == unvisited.at(i)) unvisited.erase(unvisited.begin() + i);
+            }
+            
+            // Set DFS number
+
+
+            // Push first neighboring node to the stack
+            vector<Node*> adj_list = temp->get_adjacency_list();
+            bool adj = false;
+            for(Node* node : adj_list) {
+                if(!node->is_visited()) {
+                    stack.push(node);
+                    adj = true;
+                    break;
+                }
+            }
+
+            if (!adj) {
+
+            }
+        }
+        
+        counter++;
     }
 
     return visited;

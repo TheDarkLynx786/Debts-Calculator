@@ -2,6 +2,7 @@
 #include "Node.h"
 #include "Graph.h"
 #include <vector>
+#include <stack>
 
 using namespace std;
 
@@ -26,12 +27,15 @@ int main() {
     graph.add_node(node7);
 
     graph.add_edge(node1, node2, 5);
-    graph.add_edge(node1, node3, 10);
-    graph.add_edge(node2, node4, 15);
-    graph.add_edge(node3, node4, 20);
-    graph.add_edge(node3, node5, 25);
-    graph.add_edge(node4, node6, 15);
-    graph.add_edge(node6, node7, 20);
+    graph.add_edge(node2, node3, 10);
+    graph.add_edge(node3, node4, 15);
+    graph.add_edge(node4, node3, 20);
+    graph.add_edge(node2, node6, 25);
+    graph.add_edge(node2, node7, 15);
+    graph.add_edge(node6, node5, 20);
+    graph.add_edge(node5, node6, 20);
+    graph.add_edge(node7, node1, 20);
+    graph.add_edge(node7, node6, 20);
 
     //Display Nodes
     graph.print_nodes();
@@ -39,17 +43,18 @@ int main() {
     //Display Edges
     graph.print_edges();
 
-    vector<Node*> dfs = graph.tarjan();
+    stack<Node*> stack;
+    vector<Node*> dfs; 
+    graph.dfs(graph.get_nodes(), dfs, stack);
 
     for(Node* node : dfs) {
         cout << node->get_name() << " ";
     }
 
     // Clean up dynamically allocated memory
-    delete node1;
-    delete node2;
-    delete node3;
-    delete node4;
+    for(Node* nd : graph.get_nodes()) {
+        delete nd;
+    }
 
 
     return 0;
