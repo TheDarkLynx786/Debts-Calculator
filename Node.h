@@ -30,6 +30,8 @@ class Node {
         // Get Node Number
         int get_num() const;
 
+        void set_num(int val);
+
         // Get Node Name
         string get_name() const;
 

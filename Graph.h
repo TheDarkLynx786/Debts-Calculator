@@ -29,7 +29,13 @@ class Graph {
 
         void dfs(vector<Node*> unvisited, vector<Node*>& visited, stack<Node*> exploration_stack);
 
-        vector<Node*> tarjan();
+        vector<vector<Node*>> tarjan_solve();
+
+        void tarjan(vector<Node*> unvisited, stack<Node*> scc_stack, stack<Node*> exploration_stack, vector<vector<Node*>>& sccs, int ct, vector<int> num, vector<int> low);
+
+        bool check_stack(Node* node, stack<Node*> stack);
+        
+        void delete_nodes();
 
         void print_nodes() const;
 

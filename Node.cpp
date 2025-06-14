@@ -10,6 +10,9 @@ int Node::get_num() const {
     return num;
 }
 
+// Set Node Number
+void Node::set_num(int val) { num = val; }
+
 // Get Node Name
 string Node::get_name() const {
     return this->name;

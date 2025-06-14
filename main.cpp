@@ -14,7 +14,7 @@ int main() {
     Node* node4 = new Node("D", 4);
     Node* node5 = new Node("E", 5);
     Node* node6 = new Node("F", 6);
-    Node* node7 = new Node("G", 2);
+    Node* node7 = new Node("G", 7);
 
     //Graph
     Graph graph;
@@ -43,18 +43,18 @@ int main() {
     //Display Edges
     graph.print_edges();
 
-    stack<Node*> stack;
-    vector<Node*> dfs; 
-    graph.dfs(graph.get_nodes(), dfs, stack);
+    vector<vector<Node*>> sccs = graph.tarjan_solve();
 
-    for(Node* node : dfs) {
-        cout << node->get_name() << " ";
+    for(vector<Node*> nodes : sccs) {
+        for (Node* nd : nodes) {
+            cout << nd->get_name() << " ";
+        }
     }
+    cout << endl << endl;
+
 
     // Clean up dynamically allocated memory
-    for(Node* nd : graph.get_nodes()) {
-        delete nd;
-    }
+    graph.delete_nodes();
 
 
     return 0;
