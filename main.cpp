@@ -34,6 +34,7 @@ int main() {
     graph.add_edge(node2, node7, 15);
     graph.add_edge(node6, node5, 20);
     graph.add_edge(node5, node6, 20);
+    graph.add_edge(node5, node3, 15);
     graph.add_edge(node7, node1, 20);
     graph.add_edge(node7, node6, 20);
 
@@ -43,12 +44,16 @@ int main() {
     //Display Edges
     graph.print_edges();
 
+    //graph.dfs_solve();
+    
     vector<vector<Node*>> sccs = graph.tarjan_solve();
 
+    cout << "Strongly Connected Components (SCCs):" << endl;
     for(vector<Node*> nodes : sccs) {
         for (Node* nd : nodes) {
             cout << nd->get_name() << " ";
         }
+        cout << endl;
     }
     cout << endl << endl;
 

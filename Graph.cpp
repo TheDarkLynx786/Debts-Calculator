@@ -94,6 +94,16 @@ void Graph::print_edges() const {
     return visited;
 }*/
 
+void Graph::dfs_solve() {
+    vector<Node*> visited;
+    stack<Node*> stack;
+    dfs(nodes, visited, stack);
+
+    cout << "DFS Search: " << endl;
+    for(Node* md : visited) cout << md->get_name() << " ";
+    cout << endl;
+}
+
 void Graph::dfs(vector<Node*> unvisited, vector<Node*>& visited, stack<Node*> exploration_stack) {
     // Base Case
     if(unvisited.size() == 0) return;
@@ -220,27 +230,43 @@ vector<vector<Node*>> Graph::tarjan_solve() {
     stack<Node*> scc_stack, exploration_stack;
     vector<vector<Node*>> sccs;
     vector<int> num(nodes.size(), -1), low(nodes.size(), -1);
-    
+
     tarjan(nodes, scc_stack, exploration_stack, sccs, 0, num, low);
     
     return sccs;
 }
 
 
-void Graph::tarjan(vector<Node*> unvisited, stack<Node*> scc_stack, stack<Node*> exploration_stack, vector<vector<Node*>>& sccs, int ct, vector<int> num, vector<int> low) {
+void Graph::tarjan(vector<Node*>& unvisited, stack<Node*>& scc_stack, stack<Node*>& exploration_stack, vector<vector<Node*>>& sccs, int ct, vector<int>& num, vector<int>& low) {
+    cout << "CT: " << ct << endl;
+    
     // Base Case
-    if (unvisited.size() == 0) return;
+    if (unvisited.size() == 0) { cout << "END" << endl; return; }
+    cout << endl;
+
+    for(Node* md : unvisited) cout << md->get_name() << " ";
+
 
     // Step
     Node* node = (exploration_stack.size() == 0)? unvisited.front() : exploration_stack.top();
     if (exploration_stack.size() != 0) exploration_stack.pop();
+
+    cout << "Node: " << node->get_name() << endl;
     
-    // Assign Node dfs_num and low_link
-    num.at(ct) = low.at(ct) = ct++;
-    node->set_num(ct);
+    
 
     // Set dfs_low
     if(!node->is_visited()) {
+
+        // Assign Node dfs_num and low_link
+        num.at(ct) = low.at(ct) = ct;
+        node->set_num(ct);
+
+        cout << "DFS Num: " << num.at(ct) << endl;
+        cout << "DFS Low: " << low.at(ct) << endl;
+
+        cout << "Unvisited Node" << endl;
+        cout <<  node->is_visited() << endl << endl;
 
         // Remove from "unvisited" and set node to visited
         for(int i = 0; i < unvisited.size(); i++) { if(unvisited.at(i) == node) unvisited.erase(unvisited.begin() + i); }
@@ -252,29 +278,43 @@ void Graph::tarjan(vector<Node*> unvisited, stack<Node*> scc_stack, stack<Node*>
         // Add each adjacent node to the exploration stack
         for(Node* nd : adj_list) exploration_stack.push(nd);
 
+        cout << endl;
+        print_stack(exploration_stack);
+        cout << endl;
+
+        Node* comparison_node = exploration_stack.top();
+
         // Push node to scc_stack
         scc_stack.push(node);
         
-        // Recurse
-        tarjan(unvisited, scc_stack, exploration_stack, sccs, ct, num, low);
+        // Recurse 
+        tarjan(unvisited, scc_stack, exploration_stack, sccs, ct + 1, num, low);
 
         // Adjust dfs_low
-        low.at(ct) = min(low.at(ct), low.at(ct + 1));
+        low.at(node->get_num()) = min(low.at(node->get_num()), low.at(comparison_node->get_num()));
+        
+        cout << "DFS Low: " << low.at(node->get_num()) << endl;
 
-    } else if (check_stack(node, scc_stack)) { low.at(ct) = min(low.at(ct), num.at(ct)); }
+    } else if (check_stack(node, scc_stack)) { cout << "Visited Node" << endl; low.at(node->get_num()) = min(low.at(node->get_num()), num.at(node->get_num()) ); cout << "DFS Num: " << num.at(ct) << endl; cout << "DFS Low: " << low.at(ct) << endl;}
     
 
     // Check if there is an SCC
-    if (num.at(ct) == low.at(ct) ) {
+    if (num.at(node->get_num()) == low.at(node->get_num()) && scc_stack.size() > 0) {
         vector<Node*> scc;
-        int upper = ct, lower = node->get_num();
+        cout << "SCC Found" << endl;
+        Node* top_node;
         do {
-            upper--;
-            scc.push_back(scc_stack.top());
+            top_node = scc_stack.top();
             scc_stack.pop();
+            scc.push_back(top_node);
 
-        } while (upper != lower);
-    
+        } while (node != top_node && scc_stack.size() > 0);
+        
+        for (Node* nd : scc) {
+            cout <<  nd->get_name() << " ";
+        }
+        cout << endl;
+
         sccs.push_back(scc);
     }
 
@@ -286,4 +326,8 @@ void Graph::delete_nodes() { for(Node* nd : nodes) { delete nd; } }
 bool Graph::check_stack(Node* node, stack<Node*> stack) {
     while(stack.size() != 0) { if (stack.top() == node) return true; else stack.pop(); }
     return false;
+}
+
+void Graph::print_stack(stack<Node*> stack) { 
+    while(stack.size() != 0) { cout << stack.top()->get_name() << " "; stack.pop(); }
 }
